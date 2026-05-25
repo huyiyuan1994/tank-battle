@@ -46,6 +46,14 @@ canvas { border: 2px solid #444; }
     <span>💥 <span id="score">0</span></span>
     <span>🎯 关卡 <span id="level">1</span></span>
 </div>
+<div id="start" class="overlay">
+    <h1 style="color:#ff0;">坦 克 大 战</h1>
+    <p>按 <span class="key">ENTER</span> 开始游戏</p>
+    <p style="margin-top:15px; font-size:14px; color:#888;">
+        <span class="key">WASD</span> / <span class="key">↑↓←→</span> 移动 &nbsp;
+        <span class="key">空格</span> / <span class="key">J</span> 射击
+    </p>
+</div>
 <div id="gameover" class="overlay hidden">
     <h1>GAME OVER</h1>
     <p>最终得分: <span id="finalScore">0</span></p>
@@ -123,7 +131,7 @@ let map = [];
 let player, enemies, bullets, explosions;
 let keys = {};
 let lives, score, currentLevel;
-let gameState = 'playing'; // playing | dead | gameover | win
+let gameState = 'start'; // start | playing | dead | gameover | win
 let spawnTimer = 0;
 let enemyCount = 0;
 const MAX_ENEMIES = 4;
@@ -262,6 +270,7 @@ function loadLevel(lvl) {
     enemyCount = 0;
     spawnTimer = 0;
     gameState = 'playing';
+    document.getElementById('start').classList.add('hidden');
     document.getElementById('gameover').classList.add('hidden');
     document.getElementById('win').classList.add('hidden');
     document.getElementById('level').textContent = lvl + 1;
@@ -316,7 +325,7 @@ function update() {
     if (gameState !== 'playing') return;
     // 玩家射击
     player.shootCooldown = Math.max(0, player.shootCooldown - 1);
-    if (keys[' '] || keys['KeyJ']) {
+    if (keys['Space'] || keys['KeyJ']) {
         const b = player.shoot();
         if (b) bullets.push(b);
     }
@@ -422,19 +431,25 @@ function gameLoop() {
 // 键盘事件
 window.addEventListener('keydown', e => {
     keys[e.code] = true;
-    if (e.code === 'Enter' && (gameState === 'gameover' || gameState === 'win')) {
-        if (gameState === 'gameover') {
+    if (e.code === 'Enter') {
+        if (gameState === 'start') {
+            gameState = 'playing';
+            document.getElementById('start').classList.add('hidden');
+        } else if (gameState === 'gameover') {
             lives = 3; score = 0; currentLevel = 0;
             document.getElementById('lives').textContent = lives;
             document.getElementById('score').textContent = score;
-        } else {
+            loadLevel(currentLevel);
+        } else if (gameState === 'win') {
             currentLevel++;
+            loadLevel(currentLevel);
         }
-        loadLevel(currentLevel);
     }
-    e.preventDefault();
+    if (e.code.startsWith('Arrow') || e.code === 'Space' || e.code === 'KeyJ' || e.code === 'KeyW' || e.code === 'KeyA' || e.code === 'KeyS' || e.code === 'KeyD') {
+        e.preventDefault();
+    }
 });
-window.addEventListener('keyup', e => { keys[e.code] = false; e.preventDefault(); });
+window.addEventListener('keyup', e => { keys[e.code] = false; });
 
 // 初始化
 let score = 0;
