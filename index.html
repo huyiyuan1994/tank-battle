@@ -269,11 +269,14 @@ function loadLevel(lvl) {
     explosions = [];
     enemyCount = 0;
     spawnTimer = 0;
-    gameState = 'playing';
-    document.getElementById('start').classList.add('hidden');
     document.getElementById('gameover').classList.add('hidden');
     document.getElementById('win').classList.add('hidden');
     document.getElementById('level').textContent = lvl + 1;
+}
+
+function startGame() {
+    document.getElementById('start').classList.add('hidden');
+    gameState = 'playing';
 }
 
 function spawnEnemy() {
@@ -433,16 +436,17 @@ window.addEventListener('keydown', e => {
     keys[e.code] = true;
     if (e.code === 'Enter') {
         if (gameState === 'start') {
-            gameState = 'playing';
-            document.getElementById('start').classList.add('hidden');
+            startGame();
         } else if (gameState === 'gameover') {
             lives = 3; score = 0; currentLevel = 0;
             document.getElementById('lives').textContent = lives;
             document.getElementById('score').textContent = score;
             loadLevel(currentLevel);
+            gameState = 'playing';
         } else if (gameState === 'win') {
             currentLevel++;
             loadLevel(currentLevel);
+            gameState = 'playing';
         }
     }
     if (e.code.startsWith('Arrow') || e.code === 'Space' || e.code === 'KeyJ' || e.code === 'KeyW' || e.code === 'KeyA' || e.code === 'KeyS' || e.code === 'KeyD') {
