@@ -38,6 +38,8 @@ canvas { border: 2px solid #444; }
 .overlay p { font-size: 20px; color: #ccc; margin: 5px 0; }
 .overlay .key { color: #ff0; }
 .hidden { display: none; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+#start p:first-of-type { animation: blink 1s infinite; }
 </style>
 </head>
 <body>
@@ -64,7 +66,7 @@ canvas { border: 2px solid #444; }
     <p>最终得分: <span id="winScore">0</span></p>
     <p>按 <span class="key">ENTER</span> 下一关</p>
 </div>
-<canvas id="game"></canvas>
+<canvas id="game" tabindex="0"></canvas>
 
 <script>
 const canvas = document.getElementById('game');
@@ -455,12 +457,19 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('keyup', e => { keys[e.code] = false; });
 
+// 点击画布开始
+canvas.addEventListener('click', () => {
+    if (gameState === 'start') startGame();
+});
+
 // 初始化
 let score = 0;
 lives = 3;
 currentLevel = 0;
 loadLevel(0);
 gameLoop();
+canvas.focus();
+console.log('坦克大战已加载，gameState=' + gameState + '，按Enter或点击画面开始');
 </script>
 </body>
 </html>
