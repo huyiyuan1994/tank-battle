@@ -32,12 +32,21 @@ canvas { border: 2px solid #444; }
     transform: translate(-50%, -50%);
     color: #fff;
     text-align: center;
-    pointer-events: none;
 }
 .overlay h1 { font-size: 48px; margin-bottom: 10px; color: #f00; }
 .overlay p { font-size: 20px; color: #ccc; margin: 5px 0; }
 .overlay .key { color: #ff0; }
 .hidden { display: none; }
+#gameover, #win { pointer-events: none; }
+#start {
+    cursor: pointer;
+    background: rgba(0,0,0,0.85);
+    padding: 40px 80px;
+    border: 2px solid #ff0;
+    border-radius: 10px;
+    z-index: 10;
+}
+#start:hover { background: rgba(30,30,0,0.9); }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 #start p:first-of-type { animation: blink 1s infinite; }
 </style>
@@ -48,9 +57,9 @@ canvas { border: 2px solid #444; }
     <span>💥 <span id="score">0</span></span>
     <span>🎯 关卡 <span id="level">1</span></span>
 </div>
-<div id="start" class="overlay">
+<div id="start" class="overlay" onclick="startGame()">
     <h1 style="color:#ff0;">坦 克 大 战</h1>
-    <p>按 <span class="key">ENTER</span> 开始游戏</p>
+    <p>按 <span class="key">ENTER</span> 或 <span class="key">点击此处</span> 开始游戏</p>
     <p style="margin-top:15px; font-size:14px; color:#888;">
         <span class="key">WASD</span> / <span class="key">↑↓←→</span> 移动 &nbsp;
         <span class="key">空格</span> / <span class="key">J</span> 射击
@@ -433,8 +442,8 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// 键盘事件
-window.addEventListener('keydown', e => {
+// 键盘事件 - 同时监听 document 和 window
+function handleKeyDown(e) {
     keys[e.code] = true;
     if (e.code === 'Enter') {
         if (gameState === 'start') {
@@ -451,16 +460,13 @@ window.addEventListener('keydown', e => {
             gameState = 'playing';
         }
     }
-    if (e.code.startsWith('Arrow') || e.code === 'Space' || e.code === 'KeyJ' || e.code === 'KeyW' || e.code === 'KeyA' || e.code === 'KeyS' || e.code === 'KeyD') {
+    if (e.code === 'ArrowUp' || e.code === 'ArrowDown' || e.code === 'ArrowLeft' || e.code === 'ArrowRight' ||
+        e.code === 'Space' || e.code === 'KeyJ' || e.code === 'KeyW' || e.code === 'KeyA' || e.code === 'KeyS' || e.code === 'KeyD') {
         e.preventDefault();
     }
-});
-window.addEventListener('keyup', e => { keys[e.code] = false; });
-
-// 点击画布开始
-canvas.addEventListener('click', () => {
-    if (gameState === 'start') startGame();
-});
+}
+document.addEventListener('keydown', handleKeyDown);
+document.addEventListener('keyup', e => { keys[e.code] = false; });
 
 // 初始化
 let score = 0;
@@ -468,8 +474,7 @@ lives = 3;
 currentLevel = 0;
 loadLevel(0);
 gameLoop();
-canvas.focus();
-console.log('坦克大战已加载，gameState=' + gameState + '，按Enter或点击画面开始');
+console.log('坦克大战已加载，gameState=' + gameState);
 </script>
 </body>
 </html>
